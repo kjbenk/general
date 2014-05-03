@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: General
-plugin URI: general
+plugin URI: kylebenkapps.com
 Description:
 version: 1.0
 Author: Kyle Benk
@@ -44,9 +44,8 @@ register_activation_hook( __FILE__, array('General', 'register_activation'));
  * Hooks / Filter 
  */
  
-add_action('init', array('General', 'load_textdoamin'));
+add_action('init', array('General', 'load_textdomain'));
 add_action('admin_menu', array('General', 'general_menu_page'));
-add_action('admin_enqueue_scripts', array('General', 'general_include_admin_scripts'));
 
 /** 
  *  General main class
@@ -58,8 +57,6 @@ add_action('admin_enqueue_scripts', array('General', 'general_include_admin_scri
 class General {
 
 	/* Properties */
-	
-	private static $jquery_latest = 'http://code.jquery.com/jquery-latest.min.js';
 	
 	private static $text_domain = 'general';
 	
@@ -79,7 +76,7 @@ class General {
 	 * 
 	 * @since 1.0.0
 	 */
-	static function load_textdoamin() {
+	static function load_textdomain() {
 		load_plugin_textdomain(self::$text_domain, false, GENERAL_PLUGIN_DIR . '/languages');
 	}
 	
@@ -109,8 +106,8 @@ class General {
 		/* Add the menu Page */
 		
 		add_menu_page(
-			__('General', self::$text_domain),					// Page Title
-			__('General', self::$text_domain), 					// Menu Name
+			__('General', self::$text_domain),							// Page Title
+			__('General', self::$text_domain), 							// Menu Name
 	    	'manage_options', 											// Capabilities
 	    	self::$settings_page, 										// slug
 	    	array('General', 'general_admin_settings')	// Callback function
@@ -118,7 +115,7 @@ class General {
 	    
 	    /* Cast the first sub menu to the top menu */
 	    
-	    add_submenu_page(
+	    $settings_page_load = add_submenu_page(
 	    	self::$settings_page, 										// parent slug
 	    	__('Settings', self::$text_domain), 						// Page title
 	    	__('Settings', self::$text_domain), 						// Menu name
@@ -126,10 +123,11 @@ class General {
 	    	self::$settings_page, 										// slug
 	    	array('General', 'general_admin_settings')	// Callback function
 	    );
+	    add_action("admin_print_scripts-$settings_page_load", array('General', 'general_include_admin_scripts'));
 	    
 	    /* Another sub menu */
 	    
-	    add_submenu_page(
+	    $usage_page_load = add_submenu_page(
 	    	self::$settings_page, 										// parent slug 
 	    	__('Usage', self::$text_domain),  							// Page title
 	    	__('Usage', self::$text_domain),  							// Menu name
@@ -137,6 +135,25 @@ class General {
 	    	self::$usage_page, 											// slug 
 	    	array('General', 'general_admin_usage')		// Callback function
 	    );
+	    add_action("admin_print_scripts-$usage_page_load", array('General', 'general_include_admin_scripts'));
+	}
+	
+	/**
+	 * Hooks to 'admin_print_scripts-$page' 
+	 * 
+	 * @since 1.0.0
+	 */
+	static function general_include_admin_scripts() {
+		
+		/* CSS */
+		
+		wp_register_style('general_admin_css', GENERAL_PLUGIN_URL . '/include/css/general_admin.css');
+		wp_enqueue_style('general_admin_css');
+	
+		/* Javascript */
+		
+		wp_register_script('general_admin_js', GENERAL_PLUGIN_URL . '/include/js/general_admin.js');
+		wp_enqueue_script('general_admin_js');	
 	}
 	
 	/**
@@ -150,9 +167,10 @@ class General {
 			
 		/* Default values */
 		
-		if ($settings === false) 
+		if ($settings === false) {
 			$settings = self::$default;
-	
+		}
+		
 		/* Save data nd check nonce */
 		
 		if (isset($_POST['submit']) && check_admin_referer('general_admin_settings')) {
@@ -161,11 +179,12 @@ class General {
 			
 			/* Default values */
 			
-			if ($settings === false) 
+			if ($settings === false) {
 				$settings = self::$default;
+			}
 				
 			$settings = array(
-				'title'		=> stripcslashes(sanitize_text_field($_POST['general_settings_title'])),
+				'title'	=> stripcslashes(sanitize_text_field($_POST['general_settings_title'])),
 				'size'	=> stripcslashes(sanitize_text_field($_POST['general_settings_size']))
 			);
 			
@@ -235,30 +254,8 @@ class General {
 		
 		<h1><?php _e('Usage Page', self::$text_domain); ?></h1>
 		
+		<p><?php _e('Information about how to use this plugin.', self::$text_domain); ?></p>
 		<?php
-	}
-	
-	/**
-	 * Hooks to 'admin_enqueue_scripts' 
-	 * 
-	 * @since 1.0.0
-	 */
-	static function general_include_admin_scripts() {
-		
-		/* Include Admin scripts */
-		
-		if (isset($_GET['page']) && ($_GET['page'] == self::$settings_page || $_GET['page'] == self::$usage_page)) {
-		
-			/* CSS */
-			
-			wp_register_style('general_admin_css', GENERAL_PLUGIN_URL . '/include/css/general_admin.css');
-			wp_enqueue_style('general_admin_css');
-		
-			/* Javascript */
-			
-			wp_register_script('general_admin_js', GENERAL_PLUGIN_URL . '/include/js/general_admin.js');
-			wp_enqueue_script('general_admin_js');	
-		}
 	}
 }
 
