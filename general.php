@@ -67,8 +67,12 @@ class General {
 	private static $usage_page = 'general-admin-menu-usage';
 	
 	private static $default = array(
-		'title'	=> 'Title',
-		'size'	=> '100'
+		'text'		=> 'text',
+		'textarea'	=> 'textarea',
+		'checkbox'	=> true,
+		'select'	=> '',
+		'radio'		=> '',
+		'url'		=> 'kylebenkapps.com'
 	);
 
 	/**
@@ -81,7 +85,7 @@ class General {
 	}
 	
 	/**
-	 * Hooks to 'init' 
+	 * Hooks to 'register_activation_hook' 
 	 * 
 	 * @since 1.0.0
 	 */
@@ -184,8 +188,12 @@ class General {
 			}
 				
 			$settings = array(
-				'title'	=> stripcslashes(sanitize_text_field($_POST['general_settings_title'])),
-				'size'	=> stripcslashes(sanitize_text_field($_POST['general_settings_size']))
+				'text'		=> stripcslashes(sanitize_text_field($_POST['general_settings_text'])),
+				'textarea'	=> stripcslashes(sanitize_text_field($_POST['general_settings_textarea'])),
+				'checkbox'	=> isset($_POST['general_settings_checkbox']) && $_POST['general_settings_checkbox'] ? true : false,
+				'select'	=> $_POST['general_settings_select'],
+				'radio'		=> $_POST['general_settings_radio'],
+				'url'		=> stripcslashes(sanitize_text_field($_POST['general_settings_url']))
 			);
 			
 			update_option('general_settings', $settings);
@@ -197,18 +205,68 @@ class General {
 		
 		<form method="post">
 			
-			<h3><?php _e('General', self::$text_domain); ?></h3>
+			<h3><?php _e('General Section', self::$text_domain); ?></h3>
 			
 			<table>
 				<tbody>
 				
-					<!-- Title -->
+					<!-- Text -->
 				
 					<tr>
 						<th class="general_admin_table_th">
-							<label><?php _e('Title', self::$text_domain); ?></label>
+							<label><?php _e('Text', self::$text_domain); ?></label>
 							<td class="general_admin_table_td">
-								<input id="general_settings_title" name="general_settings_title" type="text" size="60" value="<?php echo esc_attr($settings['title']); ?>">
+								<input id="general_settings_text" name="general_settings_text" type="text" size="50" value="<?php echo esc_attr($settings['text']); ?>">
+							</td>
+						</th>
+					</tr>
+					
+					<!-- TextArea -->
+				
+					<tr>
+						<th class="general_admin_table_th">
+							<label><?php _e('TextArea', self::$text_domain); ?></label>
+							<td class="general_admin_table_td">
+								<textarea rows="10" cols="50" id="general_settings_textarea" name="general_settings_textarea"><?php echo esc_attr($settings['textarea']); ?></textarea>
+							</td>
+						</th>
+					</tr>
+					
+					<!-- Checkbox -->
+				
+					<tr>
+						<th class="general_admin_table_th">
+							<label><?php _e('Checkbox', self::$text_domain); ?></label>
+							<td class="general_admin_table_td">
+								<input type="checkbox" id="general_settings_checkbox" name="general_settings_checkbox" <?php echo isset($settings['checkbox']) && $settings['checkbox'] ? 'checked="checked"' : ''; ?>/>
+							</td>
+						</th>
+					</tr>
+					
+					<!-- Select -->
+				
+					<tr>
+						<th class="general_admin_table_th">
+							<label><?php _e('Select', self::$text_domain); ?></label>
+							<td class="general_admin_table_td">
+								<select id="general_settings_select" name="general_settings_select">
+									<option value="small" <?php echo isset($settings['select']) && $settings['select'] == 'small' ? 'selected' : ''; ?>><?php _e('small', self::$text_domain); ?></option>
+									<option value="medium" <?php echo isset($settings['select']) && $settings['select'] == 'medium' ? 'selected' : ''; ?>><?php _e('medium', self::$text_domain); ?></option>
+									<option value="large" <?php echo isset($settings['select']) && $settings['select'] == 'large' ? 'selected' : ''; ?>><?php _e('large', self::$text_domain); ?></option>
+								</select>
+							</td>
+						</th>
+					</tr>
+					
+					<!-- Radio -->
+				
+					<tr>
+						<th class="general_admin_table_th">
+							<label><?php _e('Radio', self::$text_domain); ?></label>
+							<td class="general_admin_table_td">
+								<input type="radio" name="general_settings_radio" value="start" <?php echo isset($settings['radio']) && $settings['radio'] == 'start' ? 'checked="checked"' : ''; ?>/><label><?php _e('start', self::$text_domain); ?></label><br/>
+								<input type="radio" name="general_settings_radio" value="middle" <?php echo isset($settings['radio']) && $settings['radio'] == 'middle' ? 'checked="checked"' : ''; ?>/><label><?php _e('middle', self::$text_domain); ?></label><br/>
+								<input type="radio" name="general_settings_radio" value="end" <?php echo isset($settings['radio']) && $settings['radio'] == 'end' ? 'checked="checked"' : ''; ?>/><label><?php _e('end', self::$text_domain); ?></label><br/>
 							</td>
 						</th>
 					</tr>
@@ -216,18 +274,18 @@ class General {
 				</tbody>
 			</table>
 			
-			<h3><?php _e('Advanced', self::$text_domain); ?></h3>
+			<h3><?php _e('Other Section', self::$text_domain); ?></h3>
 			
 			<table>
 				<tbody>
 				
-					<!-- Size -->
+					<!-- URL -->
 				
 					<tr>
 						<th class="general_admin_table_th">
-							<label><?php _e('Size', self::$text_domain); ?></label>
+							<label><?php _e('URL', self::$text_domain); ?></label>
 							<td class="general_admin_table_td">
-								<input id="general_settings_size" name="general_settings_size" type="text" size="60" value="<?php echo esc_attr($settings['size']); ?>">
+								<input id="general_settings_url" name="general_settings_url" type="url" size="50" value="<?php echo esc_url($settings['url']); ?>">
 							</td>
 						</th>
 					</tr>
