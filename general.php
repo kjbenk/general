@@ -1,8 +1,8 @@
 <?php
 /*
 Plugin Name: General
-plugin URI: kylebenkapps.com
-Description:
+plugin URI: http://wpdevadvice.com/wordpress-general-plugin/
+Description: The main reason I have created this WordPress general plugin repository is to give you, the developer, a base to work off of.
 version: 1.0
 Author: Kyle Benk
 Author URI: http://kylebenkapps.com
@@ -47,6 +47,9 @@ register_activation_hook( __FILE__, array('General', 'register_activation'));
 add_action('init', array('General', 'load_textdomain'));
 add_action('admin_menu', array('General', 'general_menu_page'));
 
+$plugin = plugin_basename(__FILE__); 
+add_filter("plugin_action_links_$plugin", array('General', 'general_settings_link'));
+
 /** 
  *  General main class
  *
@@ -63,6 +66,8 @@ class General {
 	private static $prefix = 'general_';
 	
 	private static $settings_page = 'general-admin-menu-settings';
+	
+	private static $tabs_settings_page = 'general-admin-menu-tab-settings';
 	
 	private static $usage_page = 'general-admin-menu-usage';
 	
@@ -98,6 +103,17 @@ class General {
 		} else {
 			add_option('general_version', GENERAL_VERSION_NUM);
 		}
+	}
+	
+	/**
+	 * Hooks to 'plugin_action_links_' filter 
+	 * 
+	 * @since 1.0.0
+	 */
+	static function general_settings_link($links) { 
+		$settings_link = '<a href="admin.php?page=' . self::$settings_page . '">Settings</a>'; 
+		array_unshift($links, $settings_link); 
+		return $links; 
 	}
 	
 	/**
@@ -140,6 +156,18 @@ class General {
 	    	array('General', 'general_admin_usage')		// Callback function
 	    );
 	    add_action("admin_print_scripts-$usage_page_load", array('General', 'general_include_admin_scripts'));
+	    
+	    /* Another sub menu */
+	    
+	    $tabs_page_load = add_submenu_page(
+	    	self::$settings_page, 										// parent slug 
+	    	__('Tabs', self::$text_domain),  							// Page title
+	    	__('Tabs', self::$text_domain),  							// Menu name
+	    	'manage_options', 											// Capabilities 
+	    	self::$tabs_settings_page, 											// slug 
+	    	array('General', 'general_admin_tabs')		// Callback function
+	    );
+	    add_action("admin_print_scripts-$tabs_page_load", array('General', 'general_include_admin_scripts'));
 	}
 	
 	/**
@@ -313,6 +341,43 @@ class General {
 		<h1><?php _e('Usage Page', self::$text_domain); ?></h1>
 		
 		<p><?php _e('Information about how to use this plugin.', self::$text_domain); ?></p>
+		<?php
+	}
+	
+	/**
+	 * Displays the HTML for the 'general-admin-menu-tab-settings' admin page 
+	 * 
+	 * @since 1.0.0
+	 */
+	static function general_admin_tabs() {
+		
+		wp_enqueue_script('jquery');
+		wp_enqueue_script('jquery-ui-tabs');
+		?>
+		
+		<script type="text/javascript">
+			jQuery(document).ready(function($){
+				$("#tabs").tabs();
+			});
+		</script>
+		
+		<h1><?php _e('Tabs Page', self::$text_domain); ?></h1>
+		
+		<div id="tabs">
+			<ul>
+				<li><a href="#general_tab_1"><span class="general_admin_tabs"><?php _e('Tab 1', self::$text_domain); ?></span></a></li>
+				<li><a href="#general_tab_2"><span class="general_admin_tabs"><?php _e('Tab 2', self::$text_domain); ?></span></a></li>
+			</ul>
+			
+			<div id="general_tab_1">
+				<p><?php _e('Content of Tab 1', self::$text_domain); ?></p>
+			</div>
+			
+			<div id="general_tab_2">
+				<p><?php _e('Content of Tab 2', self::$text_domain); ?></p>
+			</div>
+					
+		</div>
 		<?php
 	}
 }
