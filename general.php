@@ -9,8 +9,8 @@ Author URI: http://kylebenkapps.com
 License: GPL2
 */
 
-/** 
- * Global Definitions 
+/**
+ * Global Definitions
  */
 
 /* Plugin Name */
@@ -27,30 +27,30 @@ if (!defined('GENERAL_PLUGIN_DIR'))
 
 if (!defined('GENERAL_PLUGIN_URL'))
     define('GENERAL_PLUGIN_URL', WP_PLUGIN_URL . '/' . GENERAL_PLUGIN_NAME);
-  
+
 /* Plugin verison */
 
 if (!defined('GENERAL_VERSION_NUM'))
     define('GENERAL_VERSION_NUM', '1.0.0');
- 
- 
-/** 
- * Activatation / Deactivation 
- */  
+
+
+/**
+ * Activatation / Deactivation
+ */
 
 register_activation_hook( __FILE__, array('General', 'register_activation'));
 
-/** 
- * Hooks / Filter 
+/**
+ * Hooks / Filter
  */
- 
+
 add_action('init', array('General', 'load_textdomain'));
 add_action('admin_menu', array('General', 'general_menu_page'));
 
-$plugin = plugin_basename(__FILE__); 
+$plugin = plugin_basename(__FILE__);
 add_filter("plugin_action_links_$plugin", array('General', 'general_settings_link'));
 
-/** 
+/**
  *  General main class
  *
  * @since 1.0.0
@@ -60,17 +60,17 @@ add_filter("plugin_action_links_$plugin", array('General', 'general_settings_lin
 class General {
 
 	/* Properties */
-	
+
 	private static $text_domain = 'general';
-	
+
 	private static $prefix = 'general_';
-	
+
 	private static $settings_page = 'general-admin-menu-settings';
-	
+
 	private static $tabs_settings_page = 'general-admin-menu-tab-settings';
-	
+
 	private static $usage_page = 'general-admin-menu-usage';
-	
+
 	private static $default = array(
 		'text'		=> 'text',
 		'textarea'	=> 'textarea',
@@ -81,50 +81,50 @@ class General {
 	);
 
 	/**
-	 * Load the text domain 
-	 * 
+	 * Load the text domain
+	 *
 	 * @since 1.0.0
 	 */
 	static function load_textdomain() {
 		load_plugin_textdomain(self::$text_domain, false, GENERAL_PLUGIN_DIR . '/languages');
 	}
-	
+
 	/**
-	 * Hooks to 'register_activation_hook' 
-	 * 
+	 * Hooks to 'register_activation_hook'
+	 *
 	 * @since 1.0.0
 	 */
 	static function register_activation() {
-	
+
 		/* Check if multisite, if so then save as site option */
-		
+
 		if (is_multisite()) {
 			add_site_option('general_version', GENERAL_VERSION_NUM);
 		} else {
 			add_option('general_version', GENERAL_VERSION_NUM);
 		}
 	}
-	
+
 	/**
-	 * Hooks to 'plugin_action_links_' filter 
-	 * 
+	 * Hooks to 'plugin_action_links_' filter
+	 *
 	 * @since 1.0.0
 	 */
-	static function general_settings_link($links) { 
-		$settings_link = '<a href="admin.php?page=' . self::$settings_page . '">Settings</a>'; 
-		array_unshift($links, $settings_link); 
-		return $links; 
+	static function general_settings_link($links) {
+		$settings_link = '<a href="admin.php?page=' . self::$settings_page . '">Settings</a>';
+		array_unshift($links, $settings_link);
+		return $links;
 	}
-	
+
 	/**
-	 * Hooks to 'admin_menu' 
-	 * 
+	 * Hooks to 'admin_menu'
+	 *
 	 * @since 1.0.0
 	 */
 	static function general_menu_page() {
-		
+
 		/* Add the menu Page */
-		
+
 		add_menu_page(
 			__('General', self::$text_domain),							// Page Title
 			__('General', self::$text_domain), 							// Menu Name
@@ -132,9 +132,9 @@ class General {
 	    	self::$settings_page, 										// slug
 	    	array('General', 'general_admin_settings')	// Callback function
 	    );
-	    
+
 	    /* Cast the first sub menu to the top menu */
-	    
+
 	    $settings_page_load = add_submenu_page(
 	    	self::$settings_page, 										// parent slug
 	    	__('Settings', self::$text_domain), 						// Page title
@@ -144,77 +144,77 @@ class General {
 	    	array('General', 'general_admin_settings')	// Callback function
 	    );
 	    add_action("admin_print_scripts-$settings_page_load", array('General', 'general_include_admin_scripts'));
-	    
+
 	    /* Another sub menu */
-	    
+
 	    $usage_page_load = add_submenu_page(
-	    	self::$settings_page, 										// parent slug 
+	    	self::$settings_page, 										// parent slug
 	    	__('Usage', self::$text_domain),  							// Page title
 	    	__('Usage', self::$text_domain),  							// Menu name
-	    	'manage_options', 											// Capabilities 
-	    	self::$usage_page, 											// slug 
+	    	'manage_options', 											// Capabilities
+	    	self::$usage_page, 											// slug
 	    	array('General', 'general_admin_usage')		// Callback function
 	    );
 	    add_action("admin_print_scripts-$usage_page_load", array('General', 'general_include_admin_scripts'));
-	    
+
 	    /* Another sub menu */
-	    
+
 	    $tabs_page_load = add_submenu_page(
-	    	self::$settings_page, 										// parent slug 
+	    	self::$settings_page, 										// parent slug
 	    	__('Tabs', self::$text_domain),  							// Page title
 	    	__('Tabs', self::$text_domain),  							// Menu name
-	    	'manage_options', 											// Capabilities 
-	    	self::$tabs_settings_page, 											// slug 
+	    	'manage_options', 											// Capabilities
+	    	self::$tabs_settings_page, 											// slug
 	    	array('General', 'general_admin_tabs')		// Callback function
 	    );
 	    add_action("admin_print_scripts-$tabs_page_load", array('General', 'general_include_admin_scripts'));
 	}
-	
+
 	/**
-	 * Hooks to 'admin_print_scripts-$page' 
-	 * 
+	 * Hooks to 'admin_print_scripts-$page'
+	 *
 	 * @since 1.0.0
 	 */
 	static function general_include_admin_scripts() {
-		
+
 		/* CSS */
-		
+
 		wp_register_style('general_admin_css', GENERAL_PLUGIN_URL . '/include/css/general_admin.css');
 		wp_enqueue_style('general_admin_css');
-	
+
 		/* Javascript */
-		
+
 		wp_register_script('general_admin_js', GENERAL_PLUGIN_URL . '/include/js/general_admin.js');
-		wp_enqueue_script('general_admin_js');	
+		wp_enqueue_script('general_admin_js');
 	}
-	
+
 	/**
 	 * Displays the HTML for the 'general-admin-menu-settings' admin page
-	 * 
+	 *
 	 * @since 1.0.0
 	 */
 	static function general_admin_settings() {
-		
+
 		$settings = get_option('general_settings');
-			
+
 		/* Default values */
-		
+
 		if ($settings === false) {
 			$settings = self::$default;
 		}
-		
+
 		/* Save data nd check nonce */
-		
+
 		if (isset($_POST['submit']) && check_admin_referer('general_admin_settings')) {
-			
+
 			$settings = get_option('general_settings');
-			
+
 			/* Default values */
-			
+
 			if ($settings === false) {
 				$settings = self::$default;
 			}
-				
+
 			$settings = array(
 				'text'		=> stripcslashes(sanitize_text_field($_POST['general_settings_text'])),
 				'textarea'	=> stripcslashes(sanitize_text_field($_POST['general_settings_textarea'])),
@@ -223,23 +223,23 @@ class General {
 				'radio'		=> $_POST['general_settings_radio'],
 				'url'		=> stripcslashes(sanitize_text_field($_POST['general_settings_url']))
 			);
-			
+
 			update_option('general_settings', $settings);
 		}
-		
+
 		?>
-		
+
 		<h1><?php _e('Settings Page', self::$text_domain); ?></h1>
-		
+
 		<form method="post">
-			
+
 			<h3><?php _e('General Section', self::$text_domain); ?></h3>
-			
+
 			<table>
 				<tbody>
-				
+
 					<!-- Text -->
-				
+
 					<tr>
 						<th class="general_admin_table_th">
 							<label><?php _e('Text', self::$text_domain); ?></label>
@@ -248,9 +248,9 @@ class General {
 							</td>
 						</th>
 					</tr>
-					
+
 					<!-- TextArea -->
-				
+
 					<tr>
 						<th class="general_admin_table_th">
 							<label><?php _e('TextArea', self::$text_domain); ?></label>
@@ -259,9 +259,9 @@ class General {
 							</td>
 						</th>
 					</tr>
-					
+
 					<!-- Checkbox -->
-				
+
 					<tr>
 						<th class="general_admin_table_th">
 							<label><?php _e('Checkbox', self::$text_domain); ?></label>
@@ -270,9 +270,9 @@ class General {
 							</td>
 						</th>
 					</tr>
-					
+
 					<!-- Select -->
-				
+
 					<tr>
 						<th class="general_admin_table_th">
 							<label><?php _e('Select', self::$text_domain); ?></label>
@@ -285,9 +285,9 @@ class General {
 							</td>
 						</th>
 					</tr>
-					
+
 					<!-- Radio -->
-				
+
 					<tr>
 						<th class="general_admin_table_th">
 							<label><?php _e('Radio', self::$text_domain); ?></label>
@@ -298,17 +298,17 @@ class General {
 							</td>
 						</th>
 					</tr>
-				
+
 				</tbody>
 			</table>
-			
+
 			<h3><?php _e('Other Section', self::$text_domain); ?></h3>
-			
+
 			<table>
 				<tbody>
-				
+
 					<!-- URL -->
-				
+
 					<tr>
 						<th class="general_admin_table_th">
 							<label><?php _e('URL', self::$text_domain); ?></label>
@@ -317,66 +317,66 @@ class General {
 							</td>
 						</th>
 					</tr>
-				
+
 				</tbody>
 			</table>
-			
+
 		<?php wp_nonce_field('general_admin_settings'); ?>
-		
+
 		<?php submit_button(); ?>
-		
+
 		</form>
-		
+
 		<?php
 	}
-	
+
 	/**
-	 * Displays the HTML for the 'general-admin-menu-usage' admin page 
-	 * 
+	 * Displays the HTML for the 'general-admin-menu-usage' admin page
+	 *
 	 * @since 1.0.0
 	 */
 	static function general_admin_usage() {
 		?>
-		
+
 		<h1><?php _e('Usage Page', self::$text_domain); ?></h1>
-		
+
 		<p><?php _e('Information about how to use this plugin.', self::$text_domain); ?></p>
 		<?php
 	}
-	
+
 	/**
-	 * Displays the HTML for the 'general-admin-menu-tab-settings' admin page 
-	 * 
+	 * Displays the HTML for the 'general-admin-menu-tab-settings' admin page
+	 *
 	 * @since 1.0.0
 	 */
 	static function general_admin_tabs() {
-		
+
 		wp_enqueue_script('jquery');
 		wp_enqueue_script('jquery-ui-tabs');
 		?>
-		
+
 		<script type="text/javascript">
 			jQuery(document).ready(function($){
 				$("#tabs").tabs();
 			});
 		</script>
-		
+
 		<h1><?php _e('Tabs Page', self::$text_domain); ?></h1>
-		
+
 		<div id="tabs">
 			<ul>
 				<li><a href="#general_tab_1"><span class="general_admin_tabs"><?php _e('Tab 1', self::$text_domain); ?></span></a></li>
 				<li><a href="#general_tab_2"><span class="general_admin_tabs"><?php _e('Tab 2', self::$text_domain); ?></span></a></li>
 			</ul>
-			
+
 			<div id="general_tab_1">
 				<p><?php _e('Content of Tab 1', self::$text_domain); ?></p>
 			</div>
-			
+
 			<div id="general_tab_2">
 				<p><?php _e('Content of Tab 2', self::$text_domain); ?></p>
 			</div>
-					
+
 		</div>
 		<?php
 	}

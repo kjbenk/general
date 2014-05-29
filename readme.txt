@@ -1,6 +1,6 @@
 === Gabfire General ===
 Contributors: kjbenk
-Donate link: 
+Donate link:
 Tags: general
 Requires at least: 1.0
 Tested up to: 1.0
