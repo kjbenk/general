@@ -98,7 +98,7 @@ class General {
 
 		/* Check if multisite, if so then save as site option */
 
-		if (is_multisite()) {
+		if (function_exists('is_multisite') && is_multisite()) {
 			add_site_option(self::$prefix . 'version', GENERAL_VERSION_NUM);
 		} else {
 			add_option(self::$prefix . 'version', GENERAL_VERSION_NUM);
@@ -200,7 +200,11 @@ class General {
 	 */
 	static function admin_settings() {
 
-		$settings = get_option(self::$prefix . 'settings');
+		if (function_exists('is_multisite') && is_multisite()) {
+			$settings = get_site_option(self::$prefix . 'settings');
+		} else {
+			$settings = get_option(self::$prefix . 'settings');
+		}
 
 		/* Default values */
 
