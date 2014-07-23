@@ -59,18 +59,68 @@ add_filter("plugin_action_links_$plugin", array('General', 'plugin_links'));
 
 class General {
 
-	/* Properties */
-
+	/**
+	 * text_domain
+	 *
+	 * (default value: 'general')
+	 *
+	 * @var string
+	 * @access private
+	 * @static
+	 */
 	private static $text_domain = 'general';
 
+	/**
+	 * prefix
+	 *
+	 * (default value: 'general_')
+	 *
+	 * @var string
+	 * @access private
+	 * @static
+	 */
 	private static $prefix = 'general_';
 
+	/**
+	 * settings_page
+	 *
+	 * (default value: 'general-admin-menu-settings')
+	 *
+	 * @var string
+	 * @access private
+	 * @static
+	 */
 	private static $settings_page = 'general-admin-menu-settings';
 
+	/**
+	 * tabs_settings_page
+	 *
+	 * (default value: 'general-admin-menu-tab-settings')
+	 *
+	 * @var string
+	 * @access private
+	 * @static
+	 */
 	private static $tabs_settings_page = 'general-admin-menu-tab-settings';
 
+	/**
+	 * usage_page
+	 *
+	 * (default value: 'general-admin-menu-usage')
+	 *
+	 * @var string
+	 * @access private
+	 * @static
+	 */
 	private static $usage_page = 'general-admin-menu-usage';
 
+	/**
+	 * default
+	 *
+	 * @var mixed
+	 * @access private
+	 * @static
+	 */
 	private static $default = array(
 		'text'		=> 'text',
 		'textarea'	=> 'textarea',
