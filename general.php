@@ -283,7 +283,11 @@ class General {
 				'url'		=> stripcslashes(sanitize_text_field($_POST[self::$prefix . 'url']))
 			);
 
-			update_option(self::$prefix . 'settings', $settings);
+			if (function_exists('is_multisite') && is_multisite()) {
+				update_site_option(self::$prefix . 'settings', $settings);
+			} else {
+				update_option(self::$prefix . 'settings', $settings);
+			}
 		}
 
 		require('admin/settings.php');
